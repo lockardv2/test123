@@ -3,6 +3,8 @@ from pymodbus.client.sync import ModbusTcpClient
 import time, sys, traceback
 import sqlite3
 
+test123test123test123test123test123test123test123test123test123test123test123
+aksjhdlk;akjsldkjals
 # SQLite DB 설정
 DB_NAME = '/home/sch/devlopment/server/dashboard/db.sqlite3'  # DB 경로 수정
 
