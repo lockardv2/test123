@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테트리스 게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-wrapper {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        canvas {
+            border: 3px solid white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            background: #000;
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 20px;
+            min-width: 200px;
+        }
+
+        .info-box h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            border-bottom: 2px solid white;
+            padding-bottom: 5px;
+        }
+
+        .score-display {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .next-piece {
+            width: 120px;
+            height: 120px;
+            background: #000;
+            border: 2px solid white;
+            border-radius: 5px;
+            margin: 10px auto;
+        }
+
+        .controls {
+            font-size: 0.9em;
+            line-height: 1.8;
+        }
+
+        .controls p {
+            margin: 5px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 1000;
+        }
+
+        .game-over.show {
+            display: block;
+        }
+
+        .game-over h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #f5576c;
+        }
+
+        .game-over p {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎮 테트리스</h1>
+        <div class="game-wrapper">
+            <canvas id="tetris" width="300" height="600"></canvas>
+            <div class="side-panel">
+                <div class="info-box">
+                    <h2>점수</h2>
+                    <div class="score-display" id="score">0</div>
+                </div>
+                <div class="info-box">
+                    <h2>레벨</h2>
+                    <div class="score-display" id="level">1</div>
+                </div>
+                <div class="info-box">
+                    <h2>다음 블록</h2>
+                    <canvas class="next-piece" id="nextPiece" width="120" height="120"></canvas>
+                </div>
+                <div class="info-box">
+                    <h2>조작법</h2>
+                    <div class="controls">
+                        <p>⬅️ 왼쪽: ←</p>
+                        <p>➡️ 오른쪽: →</p>
+                        <p>⬇️ 빠르게: ↓</p>
+                        <p>🔄 회전: ↑</p>
+                        <p>⏬ 한번에: Space</p>
+                    </div>
+                </div>
+                <button id="startBtn">게임 시작</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2>게임 오버!</h2>
+        <p>최종 점수: <span id="finalScore">0</span></p>
+        <button onclick="location.reload()">다시 시작</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('tetris');
+        const ctx = canvas.getContext('2d');
+        const nextCanvas = document.getElementById('nextPiece');
+        const nextCtx = nextCanvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+        const startBtn = document.getElementById('startBtn');
+
+        const COLS = 10;
+        const ROWS = 20;
+        const BLOCK_SIZE = 30;
+
+        // 테트로미노 모양 정의
+        const SHAPES = {
+            I: [[1, 1, 1, 1]],
+            O: [[1, 1], [1, 1]],
+            T: [[0, 1, 0], [1, 1, 1]],
+            S: [[0, 1, 1], [1, 1, 0]],
+            Z: [[1, 1, 0], [0, 1, 1]],
+            J: [[1, 0, 0], [1, 1, 1]],
+            L: [[0, 0, 1], [1, 1, 1]]
+        };
+
+        const COLORS = {
+            I: '#00f0f0',
+            O: '#f0f000',
+            T: '#a000f0',
+            S: '#00f000',
+            Z: '#f00000',
+            J: '#0000f0',
+            L: '#f0a000'
+        };
+
+        let board = [];
+        let currentPiece = null;
+        let nextPiece = null;
+        let score = 0;
+        let level = 1;
+        let gameInterval = null;
+        let gameRunning = false;
+
+        // 보드 초기화
+        function initBoard() {
+            board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+        }
+
+        // 새로운 피스 생성
+        function createPiece() {
+            const shapes = Object.keys(SHAPES);
+            const shape = shapes[Math.floor(Math.random() * shapes.length)];
+            return {
+                shape: shape,
+                matrix: SHAPES[shape],
+                x: Math.floor(COLS / 2) - Math.floor(SHAPES[shape][0].length / 2),
+                y: 0,
+                color: COLORS[shape]
+            };
+        }
+
+        // 피스 그리기
+        function drawPiece(piece, context, offsetX = 0, offsetY = 0, blockSize = BLOCK_SIZE) {
+            context.fillStyle = piece.color;
+            piece.matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value) {
+                        context.fillStyle = piece.color;
+                        context.fillRect(
+                            (piece.x + x) * blockSize + offsetX,
+                            (piece.y + y) * blockSize + offsetY,
+                            blockSize - 1,
+                            blockSize - 1
+                        );
+                        // 3D 효과
+                        context.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                        context.strokeRect(
+                            (piece.x + x) * blockSize + offsetX,
+                            (piece.y + y) * blockSize + offsetY,
+                            blockSize - 1,
+                            blockSize - 1
+                        );
+                    }
+                });
+            });
+        }
+
+        // 보드 그리기
+        function drawBoard() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            board.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value) {
+                        ctx.fillStyle = value;
+                        ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                        ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+                    }
+                });
+            });
+        }
+
+        // 다음 피스 그리기
+        function drawNextPiece() {
+            nextCtx.fillStyle = '#000';
+            nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+
+            if (nextPiece) {
+                const tempPiece = { ...nextPiece, x: 0, y: 0 };
+                const offsetX = (nextCanvas.width - nextPiece.matrix[0].length * 25) / 2;
+                const offsetY = (nextCanvas.height - nextPiece.matrix.length * 25) / 2;
+
+                nextCtx.fillStyle = nextPiece.color;
+                nextPiece.matrix.forEach((row, y) => {
+                    row.forEach((value, x) => {
+                        if (value) {
+                            nextCtx.fillStyle = nextPiece.color;
+                            nextCtx.fillRect(x * 25 + offsetX, y * 25 + offsetY, 24, 24);
+                            nextCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                            nextCtx.strokeRect(x * 25 + offsetX, y * 25 + offsetY, 24, 24);
+                        }
+                    });
+                });
+            }
+        }
+
+        // 충돌 감지
+        function collision(piece, offsetX = 0, offsetY = 0) {
+            for (let y = 0; y < piece.matrix.length; y++) {
+                for (let x = 0; x < piece.matrix[y].length; x++) {
+                    if (piece.matrix[y][x]) {
+                        const newX = piece.x + x + offsetX;
+                        const newY = piece.y + y + offsetY;
+
+                        if (newX < 0 || newX >= COLS || newY >= ROWS) {
+                            return true;
+                        }
+                        if (newY >= 0 && board[newY][newX]) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        // 피스 고정
+        function mergePiece() {
+            currentPiece.matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value) {
+                        const boardY = currentPiece.y + y;
+                        const boardX = currentPiece.x + x;
+                        if (boardY >= 0) {
+                            board[boardY][boardX] = currentPiece.color;
+                        }
+                    }
+                });
+            });
+        }
+
+        // 라인 제거
+        function clearLines() {
+            let linesCleared = 0;
+
+            for (let y = ROWS - 1; y >= 0; y--) {
+                if (board[y].every(cell => cell !== 0)) {
+                    board.splice(y, 1);
+                    board.unshift(Array(COLS).fill(0));
+                    linesCleared++;
+                    y++;
+                }
+            }
+
+            if (linesCleared > 0) {
+                score += linesCleared * 100 * level;
+                level = Math.floor(score / 1000) + 1;
+                scoreElement.textContent = score;
+                levelElement.textContent = level;
+
+                // 레벨에 따라 속도 증가
+                if (gameInterval) {
+                    clearInterval(gameInterval);
+                    gameInterval = setInterval(gameLoop, Math.max(100, 1000 - level * 100));
+                }
+            }
+        }
+
+        // 피스 회전
+        function rotate() {
+            const rotated = currentPiece.matrix[0].map((_, i) =>
+                currentPiece.matrix.map(row => row[i]).reverse()
+            );
+
+            const previousMatrix = currentPiece.matrix;
+            currentPiece.matrix = rotated;
+
+            if (collision(currentPiece)) {
+                currentPiece.matrix = previousMatrix;
+            }
+        }
+
+        // 피스 이동
+        function move(dir) {
+            currentPiece.x += dir;
+            if (collision(currentPiece)) {
+                currentPiece.x -= dir;
+            }
+        }
+
+        // 피스 하강
+        function drop() {
+            currentPiece.y++;
+            if (collision(currentPiece)) {
+                currentPiece.y--;
+                mergePiece();
+                clearLines();
+
+                currentPiece = nextPiece;
+                nextPiece = createPiece();
+                drawNextPiece();
+
+                if (collision(currentPiece)) {
+                    gameOver();
+                }
+            }
+        }
+
+        // 한번에 떨어뜨리기
+        function hardDrop() {
+            while (!collision(currentPiece, 0, 1)) {
+                currentPiece.y++;
+            }
+            drop();
+        }
+
+        // 게임 루프
+        function gameLoop() {
+            drop();
+            draw();
+        }
+
+        // 화면 그리기
+        function draw() {
+            drawBoard();
+            if (currentPiece) {
+                drawPiece(currentPiece, ctx);
+            }
+        }
+
+        // 게임 시작
+        function startGame() {
+            if (gameRunning) return;
+
+            initBoard();
+            score = 0;
+            level = 1;
+            scoreElement.textContent = score;
+            levelElement.textContent = level;
+
+            currentPiece = createPiece();
+            nextPiece = createPiece();
+            drawNextPiece();
+
+            gameRunning = true;
+            startBtn.textContent = '게임 진행중...';
+            startBtn.disabled = true;
+
+            if (gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(gameLoop, 1000);
+
+            draw();
+        }
+
+        // 게임 오버
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameInterval);
+            finalScoreElement.textContent = score;
+            gameOverElement.classList.add('show');
+            startBtn.textContent = '게임 시작';
+            startBtn.disabled = false;
+        }
+
+        // 키보드 이벤트
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+
+            switch(e.key) {
+                case 'ArrowLeft':
+                    move(-1);
+                    break;
+                case 'ArrowRight':
+                    move(1);
+                    break;
+                case 'ArrowDown':
+                    drop();
+                    break;
+                case 'ArrowUp':
+                    rotate();
+                    break;
+                case ' ':
+                    hardDrop();
+                    break;
+            }
+            draw();
+            e.preventDefault();
+        });
+
+        startBtn.addEventListener('click', startGame);
+
+        // 초기 화면 그리기
+        drawBoard();
+        drawNextPiece();
+    </script>
+</body>
+</html>
