@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가위바위보 게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f7f7f7;
+            border-radius: 10px;
+        }
+
+        .score {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .choices {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            background: #667eea;
+        }
+
+        .choice-btn:hover .choice-emoji {
+            transform: scale(1.2);
+        }
+
+        .choice-emoji {
+            font-size: 3em;
+            display: block;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .choice-text {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .choice-btn:hover .choice-text {
+            color: white;
+        }
+
+        .result-area {
+            text-align: center;
+            margin: 30px 0;
+            min-height: 150px;
+        }
+
+        .selections {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .selection {
+            padding: 15px;
+            background: #f7f7f7;
+            border-radius: 10px;
+            min-width: 150px;
+        }
+
+        .selection-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .selection-emoji {
+            font-size: 2.5em;
+            margin: 10px 0;
+        }
+
+        .result-message {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .result-win {
+            color: #4caf50;
+            background: #e8f5e9;
+        }
+
+        .result-lose {
+            color: #f44336;
+            background: #ffebee;
+        }
+
+        .result-tie {
+            color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .choices {
+                flex-direction: column;
+            }
+
+            .selections {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎮 가위바위보 게임</h1>
+
+        <div class="scoreboard">
+            <div class="score">
+                <div class="score-label">플레이어</div>
+                <div class="score-value" id="playerScore">0</div>
+            </div>
+            <div class="score">
+                <div class="score-label">무승부</div>
+                <div class="score-value" id="tieScore">0</div>
+            </div>
+            <div class="score">
+                <div class="score-label">컴퓨터</div>
+                <div class="score-value" id="computerScore">0</div>
+            </div>
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="play('가위')">
+                <span class="choice-emoji">✌️</span>
+                <span class="choice-text">가위</span>
+            </button>
+            <button class="choice-btn" onclick="play('바위')">
+                <span class="choice-emoji">✊</span>
+                <span class="choice-text">바위</span>
+            </button>
+            <button class="choice-btn" onclick="play('보')">
+                <span class="choice-emoji">✋</span>
+                <span class="choice-text">보</span>
+            </button>
+        </div>
+
+        <div class="result-area" id="resultArea">
+            <p style="color: #666; font-size: 1.2em;">위에서 가위, 바위, 보 중 하나를 선택하세요!</p>
+        </div>
+
+        <button class="reset-btn" onclick="resetGame()">게임 초기화</button>
+    </div>
+
+    <script>
+        let playerScore = 0;
+        let computerScore = 0;
+        let tieScore = 0;
+
+        const choices = ['가위', '바위', '보'];
+        const emojis = {
+            '가위': '✌️',
+            '바위': '✊',
+            '보': '✋'
+        };
+
+        function getComputerChoice() {
+            return choices[Math.floor(Math.random() * choices.length)];
+        }
+
+        function determineWinner(player, computer) {
+            if (player === computer) {
+                return 'tie';
+            }
+
+            const winConditions = {
+                '가위': '보',
+                '바위': '가위',
+                '보': '바위'
+            };
+
+            return winConditions[player] === computer ? 'win' : 'lose';
+        }
+
+        function updateScore(result) {
+            if (result === 'win') {
+                playerScore++;
+                document.getElementById('playerScore').textContent = playerScore;
+            } else if (result === 'lose') {
+                computerScore++;
+                document.getElementById('computerScore').textContent = computerScore;
+            } else {
+                tieScore++;
+                document.getElementById('tieScore').textContent = tieScore;
+            }
+        }
+
+        function displayResult(playerChoice, computerChoice, result) {
+            const resultArea = document.getElementById('resultArea');
+
+            const selectionsHTML = `
+                <div class="selections">
+                    <div class="selection">
+                        <div class="selection-label">플레이어</div>
+                        <div class="selection-emoji">${emojis[playerChoice]}</div>
+                        <div>${playerChoice}</div>
+                    </div>
+                    <div class="selection">
+                        <div class="selection-label">컴퓨터</div>
+                        <div class="selection-emoji">${emojis[computerChoice]}</div>
+                        <div>${computerChoice}</div>
+                    </div>
+                </div>
+            `;
+
+            let resultMessage = '';
+            let resultClass = '';
+
+            if (result === 'win') {
+                resultMessage = '🎉 플레이어 승리!';
+                resultClass = 'result-win';
+            } else if (result === 'lose') {
+                resultMessage = '💻 컴퓨터 승리!';
+                resultClass = 'result-lose';
+            } else {
+                resultMessage = '🤝 무승부!';
+                resultClass = 'result-tie';
+            }
+
+            resultArea.innerHTML = `
+                ${selectionsHTML}
+                <div class="result-message ${resultClass}">${resultMessage}</div>
+            `;
+        }
+
+        function play(playerChoice) {
+            const computerChoice = getComputerChoice();
+            const result = determineWinner(playerChoice, computerChoice);
+
+            updateScore(result);
+            displayResult(playerChoice, computerChoice, result);
+        }
+
+        function resetGame() {
+            playerScore = 0;
+            computerScore = 0;
+            tieScore = 0;
+
+            document.getElementById('playerScore').textContent = '0';
+            document.getElementById('computerScore').textContent = '0';
+            document.getElementById('tieScore').textContent = '0';
+
+            document.getElementById('resultArea').innerHTML =
+                '<p style="color: #666; font-size: 1.2em;">위에서 가위, 바위, 보 중 하나를 선택하세요!</p>';
+        }
+    </script>
+</body>
+</html>
