@@ -10,6 +10,10 @@ def analyze_image(image_path: str, prompt: str = "이 이미지를 자세히 분
     if not path.exists():
         raise FileNotFoundError(f"이미지 파일을 찾을 수 없습니다: {image_path}")
 
+    MAX_SIZE_MB = 5
+    if path.stat().st_size > MAX_SIZE_MB * 1024 * 1024:
+        raise ValueError(f"파일 크기가 {MAX_SIZE_MB}MB를 초과합니다.")
+
     mime_type, _ = mimetypes.guess_type(image_path)
     supported = {"image/jpeg", "image/png", "image/gif", "image/webp"}
     if mime_type not in supported:
