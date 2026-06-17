@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>간단한 테트리스 예제</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .game {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      padding: 24px;
+      background: #1f2937;
+      border-radius: 18px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    }
+
+    canvas {
+      background: #020617;
+      border: 3px solid #374151;
+      border-radius: 10px;
+    }
+
+    .panel {
+      width: 220px;
+      line-height: 1.55;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 1.5rem;
+    }
+
+    .score {
+      margin: 12px 0 18px;
+      padding: 12px;
+      background: #111827;
+      border-radius: 10px;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 10px;
+      background: #38bdf8;
+      color: #082f49;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #7dd3fc;
+    }
+
+    kbd {
+      display: inline-block;
+      min-width: 1.6em;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #374151;
+      text-align: center;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <canvas id="board" width="300" height="600" aria-label="테트리스 게임 보드"></canvas>
+    <section class="panel">
+      <h1>테트리스</h1>
+      <p>브라우저에서 바로 실행할 수 있는 간단한 테트리스 예제입니다.</p>
+      <div class="score">점수: <span id="score">0</span></div>
+      <button id="restart" type="button">다시 시작</button>
+      <h2>조작법</h2>
+      <p><kbd>←</kbd> <kbd>→</kbd> 이동</p>
+      <p><kbd>↓</kbd> 빠르게 내리기</p>
+      <p><kbd>↑</kbd> 회전</p>
+      <p><kbd>Space</kbd> 즉시 떨어뜨리기</p>
+    </section>
+  </main>
+
+  <script>
+    // 게임 보드로 사용할 캔버스와 UI 요소를 가져옵니다.
+    const canvas = document.querySelector('#board');
+    const context = canvas.getContext('2d');
+    const scoreElement = document.querySelector('#score');
+    const restartButton = document.querySelector('#restart');
+
+    // 보드는 10칸 x 20칸이며, 각 칸은 30px 정사각형입니다.
+    const COLS = 10;
+    const ROWS = 20;
+    const BLOCK = 30;
+    // 블록 숫자를 실제 색상으로 바꾸기 위한 팔레트입니다. 0은 빈 칸입니다.
+    const COLORS = [
+      null,
+      '#22d3ee',
+      '#3b82f6',
+      '#f97316',
+      '#eab308',
+      '#22c55e',
+      '#a855f7',
+      '#ef4444',
+    ];
+
+    // 테트리스의 7가지 기본 블록 모양(I, J, L, O, S, T, Z)을 행렬로 표현합니다.
+    const SHAPES = [
+      [[1, 1, 1, 1]],
+      [[2, 0, 0], [2, 2, 2]],
+      [[0, 0, 3], [3, 3, 3]],
+      [[4, 4], [4, 4]],
+      [[0, 5, 5], [5, 5, 0]],
+      [[0, 6, 0], [6, 6, 6]],
+      [[7, 7, 0], [0, 7, 7]],
+    ];
+
+    // 게임 진행 중 계속 바뀌는 상태값입니다.
+    let board;
+    let piece;
+    let score;
+    let dropCounter;
+    let lastTime;
+    let gameOver;
+
+    // 빈 게임판을 만듭니다. 각 값은 비어 있으면 0, 블록이 있으면 색상 번호입니다.
+    function createBoard() {
+      return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+    }
+
+    // 무작위 블록 하나를 만들고 보드 위쪽 중앙에 배치합니다.
+    function createPiece() {
+      const matrix = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+      return {
+        matrix: matrix.map(row => [...row]),
+        x: Math.floor(COLS / 2) - Math.ceil(matrix[0].length / 2),
+        y: 0,
+      };
+    }
+
+    // 한 칸짜리 블록을 캔버스에 그립니다.
+    function drawCell(x, y, value) {
+      context.fillStyle = COLORS[value];
+      context.fillRect(x * BLOCK, y * BLOCK, BLOCK - 1, BLOCK - 1);
+      context.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      context.strokeRect(x * BLOCK + 1, y * BLOCK + 1, BLOCK - 3, BLOCK - 3);
+    }
+
+    // 행렬에 들어 있는 블록들을 지정한 위치(offset)에 맞춰 그립니다.
+    function drawMatrix(matrix, offset) {
+      matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) {
+            drawCell(x + offset.x, y + offset.y, value);
+          }
+        });
+      });
+    }
+
+    // 현재 보드와 떨어지는 블록을 모두 다시 그립니다.
+    function draw() {
+      context.fillStyle = '#020617';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      drawMatrix(board, { x: 0, y: 0 });
+      drawMatrix(piece.matrix, piece);
+
+      if (gameOver) {
+        context.fillStyle = 'rgba(2, 6, 23, 0.78)';
+        context.fillRect(0, 250, canvas.width, 100);
+        context.fillStyle = '#f9fafb';
+        context.font = 'bold 28px system-ui';
+        context.textAlign = 'center';
+        context.fillText('게임 오버', canvas.width / 2, 300);
+        context.font = '16px system-ui';
+        context.fillText('다시 시작 버튼을 눌러주세요', canvas.width / 2, 330);
+      }
+    }
+
+    // 블록이 벽, 바닥, 이미 쌓인 블록과 부딪히는지 확인합니다.
+    function collide(testPiece = piece) {
+      return testPiece.matrix.some((row, y) => row.some((value, x) => {
+        if (!value) return false;
+        const nextY = y + testPiece.y;
+        const nextX = x + testPiece.x;
+        return nextX < 0 || nextX >= COLS || nextY >= ROWS || board[nextY]?.[nextX];
+      }));
+    }
+
+    // 더 내려갈 수 없는 블록을 보드에 고정합니다.
+    function merge() {
+      piece.matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) {
+            board[y + piece.y][x + piece.x] = value;
+          }
+        });
+      });
+    }
+
+    // 꽉 찬 줄을 제거하고 제거한 줄 수에 따라 점수를 올립니다.
+    function clearLines() {
+      let cleared = 0;
+
+      for (let y = ROWS - 1; y >= 0; y -= 1) {
+        if (board[y].every(Boolean)) {
+          board.splice(y, 1);
+          board.unshift(Array(COLS).fill(0));
+          cleared += 1;
+          y += 1;
+        }
+      }
+
+      if (cleared) {
+        score += cleared * cleared * 100;
+        scoreElement.textContent = score;
+      }
+    }
+
+    // 행렬을 시계 방향으로 90도 회전합니다.
+    function rotate(matrix) {
+      return matrix[0].map((_, x) => matrix.map(row => row[x]).reverse());
+    }
+
+    // 블록을 회전하고, 벽에 걸리면 좌우로 조금 밀어서 회전을 시도합니다.
+    function rotatePiece() {
+      const rotated = rotate(piece.matrix);
+      const originalX = piece.x;
+      let shift = 1;
+      piece.matrix = rotated;
+
+      while (collide()) {
+        piece.x += shift;
+        shift = -(shift + (shift > 0 ? 1 : -1));
+        if (Math.abs(shift) > piece.matrix[0].length + 1) {
+          piece.matrix = rotate(rotate(rotate(rotated)));
+          piece.x = originalX;
+          return;
+        }
+      }
+    }
+
+    // 새 블록을 생성합니다. 시작 위치부터 충돌하면 게임 오버입니다.
+    function resetPiece() {
+      piece = createPiece();
+      if (collide()) {
+        gameOver = true;
+      }
+    }
+
+    // 블록을 한 칸 아래로 내리고, 충돌하면 보드에 고정합니다.
+    function drop() {
+      piece.y += 1;
+      if (collide()) {
+        piece.y -= 1;
+        merge();
+        clearLines();
+        resetPiece();
+      }
+      dropCounter = 0;
+    }
+
+    // 스페이스바 입력 시 블록을 가능한 가장 아래까지 즉시 떨어뜨립니다.
+    function hardDrop() {
+      while (!collide()) {
+        piece.y += 1;
+      }
+      piece.y -= 1;
+      merge();
+      clearLines();
+      resetPiece();
+      dropCounter = 0;
+    }
+
+    // direction이 -1이면 왼쪽, 1이면 오른쪽으로 이동합니다.
+    function move(direction) {
+      piece.x += direction;
+      if (collide()) {
+        piece.x -= direction;
+      }
+    }
+
+    // requestAnimationFrame이 호출하는 메인 루프입니다. 시간이 지나면 자동으로 블록을 내립니다.
+    function update(time = 0) {
+      const deltaTime = time - lastTime;
+      lastTime = time;
+
+      if (!gameOver) {
+        dropCounter += deltaTime;
+        if (dropCounter > 800) {
+          drop();
+        }
+      }
+
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    // 점수와 보드를 초기화해서 새 게임을 시작합니다.
+    function startGame() {
+      board = createBoard();
+      piece = createPiece();
+      score = 0;
+      dropCounter = 0;
+      lastTime = 0;
+      gameOver = false;
+      scoreElement.textContent = score;
+      draw();
+    }
+
+    // 키보드 입력으로 블록을 조작합니다.
+    document.addEventListener('keydown', event => {
+      if (gameOver) return;
+
+      if (event.key === 'ArrowLeft') move(-1);
+      if (event.key === 'ArrowRight') move(1);
+      if (event.key === 'ArrowDown') drop();
+      if (event.key === 'ArrowUp') rotatePiece();
+      if (event.code === 'Space') {
+        event.preventDefault();
+        hardDrop();
+      }
+    });
+
+    // 버튼을 누르면 언제든 새 게임을 시작할 수 있습니다.
+    restartButton.addEventListener('click', startGame);
+
+    // 페이지가 열리면 즉시 게임을 시작하고 애니메이션 루프를 실행합니다.
+    startGame();
+    update();
+  </script>
+</body>
+</html>
