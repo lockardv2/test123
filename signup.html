@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>회원가입</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --primary: #315cf6;
+      --primary-dark: #2448c6;
+      --text: #172033;
+      --muted: #667085;
+      --border: #d8dfeb;
+      --focus: rgba(49, 92, 246, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(49, 92, 246, 0.16), transparent 32rem),
+        linear-gradient(135deg, #f9fbff 0%, var(--bg) 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .signup-card {
+      width: min(100%, 28rem);
+      background: var(--card);
+      border: 1px solid rgba(216, 223, 235, 0.8);
+      border-radius: 1.5rem;
+      box-shadow: 0 1.5rem 4rem rgba(23, 32, 51, 0.12);
+      padding: 2.25rem;
+    }
+
+    .signup-card__eyebrow {
+      margin: 0 0 0.5rem;
+      color: var(--primary);
+      font-size: 0.875rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.75rem, 6vw, 2.35rem);
+      line-height: 1.2;
+    }
+
+    .signup-card__description {
+      margin: 0.75rem 0 2rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.45rem;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 0.85rem;
+      padding: 0.9rem 1rem;
+      font: inherit;
+      color: var(--text);
+      background: #fff;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.25rem var(--focus);
+    }
+
+    .terms {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-start;
+      margin: 1.35rem 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .terms input {
+      width: auto;
+      margin-top: 0.2rem;
+      accent-color: var(--primary);
+    }
+
+    .terms a,
+    .signin-link a {
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .terms a:hover,
+    .signin-link a:hover {
+      text-decoration: underline;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 0.95rem;
+      background: var(--primary);
+      color: #fff;
+      padding: 1rem 1.25rem;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 0.75rem 1.5rem rgba(49, 92, 246, 0.28);
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .signin-link {
+      margin: 1.5rem 0 0;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="signup-card" aria-labelledby="signup-title">
+    <p class="signup-card__eyebrow">START NOW</p>
+    <h1 id="signup-title">회원가입</h1>
+    <p class="signup-card__description">간단한 정보를 입력하고 새로운 계정을 만들어 서비스를 시작해 보세요.</p>
+
+    <form action="#" method="post">
+      <div class="form-group">
+        <label for="name">이름</label>
+        <input id="name" name="name" type="text" placeholder="홍길동" autocomplete="name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">이메일</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input id="password" name="password" type="password" placeholder="8자 이상 입력" autocomplete="new-password" minlength="8" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password-confirm">비밀번호 확인</label>
+        <input id="password-confirm" name="password-confirm" type="password" placeholder="비밀번호를 다시 입력" autocomplete="new-password" minlength="8" required />
+      </div>
+
+      <label class="terms">
+        <input type="checkbox" name="terms" required />
+        <span><a href="#">이용약관</a>과 <a href="#">개인정보처리방침</a>에 동의합니다.</span>
+      </label>
+
+      <button type="submit">계정 만들기</button>
+    </form>
+
+    <p class="signin-link">이미 계정이 있으신가요? <a href="#">로그인</a></p>
+  </main>
+</body>
+</html>
