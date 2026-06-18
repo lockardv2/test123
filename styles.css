@@ -1,4 +1,5 @@
 :root {
+  /* 화면 전반에서 재사용할 색상과 그림자 값을 변수로 모아둔다. */
   --bg: #f4efe7;
   --panel: rgba(255, 250, 244, 0.82);
   --panel-strong: #fffaf3;
@@ -21,6 +22,7 @@ body {
   min-height: 100vh;
   font-family: "Noto Sans KR", sans-serif;
   color: var(--text);
+  /* 여러 겹의 그라디언트로 평면 배경보다 깊이감 있는 인상을 만든다. */
   background:
     radial-gradient(circle at top left, rgba(200, 76, 45, 0.18), transparent 28%),
     radial-gradient(circle at right center, rgba(16, 109, 91, 0.14), transparent 24%),
@@ -54,6 +56,7 @@ body::after {
 }
 
 .page-shell {
+  /* 소개 영역과 입력 폼을 2단 레이아웃으로 배치한다. */
   width: min(1180px, calc(100% - 32px));
   margin: 32px auto;
   display: grid;
@@ -274,6 +277,7 @@ body::after {
 .form-panel,
 .feature-list article,
 .submit-button {
+  /* 주요 요소에 같은 등장 애니메이션을 적용해 화면 리듬을 맞춘다. */
   animation: fadeUp 700ms ease both;
 }
 
