@@ -1,0 +1,328 @@
+:root {
+  --bg: #f4efe7;
+  --panel: rgba(255, 250, 244, 0.82);
+  --panel-strong: #fffaf3;
+  --text: #1b1b1b;
+  --muted: #5f5a52;
+  --line: rgba(27, 27, 27, 0.12);
+  --accent: #c84c2d;
+  --accent-deep: #8f2f1a;
+  --success: #1f7a4d;
+  --error: #b42318;
+  --shadow: 0 24px 80px rgba(48, 32, 17, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Noto Sans KR", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(200, 76, 45, 0.18), transparent 28%),
+    radial-gradient(circle at right center, rgba(16, 109, 91, 0.14), transparent 24%),
+    linear-gradient(135deg, #f8f1e8 0%, #efe4d6 45%, #f6eee5 100%);
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: auto;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(10px);
+}
+
+body::before {
+  width: 300px;
+  height: 300px;
+  top: 8%;
+  right: -60px;
+  background: rgba(200, 76, 45, 0.14);
+}
+
+body::after {
+  width: 240px;
+  height: 240px;
+  bottom: 2%;
+  left: -40px;
+  background: rgba(15, 92, 79, 0.12);
+}
+
+.page-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 32px auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  background: rgba(255, 252, 247, 0.58);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.brand-panel,
+.form-panel {
+  padding: 56px;
+}
+
+.brand-panel {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(27, 27, 27, 0.92), rgba(48, 35, 26, 0.9)),
+    #1f1a16;
+  color: #fffaf3;
+}
+
+.brand-panel::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: 44px;
+  bottom: 44px;
+  border: 1px solid rgba(255, 250, 243, 0.16);
+  border-radius: 28px;
+  transform: rotate(12deg);
+}
+
+.eyebrow,
+.panel-kicker {
+  margin: 0 0 14px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.brand-panel h1,
+.form-panel h2 {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.brand-panel h1 {
+  font-size: clamp(2.8rem, 4vw, 4.8rem);
+  line-height: 0.96;
+}
+
+.brand-copy,
+.panel-header p,
+.feature-list p,
+.checkbox-row,
+.form-message {
+  color: rgba(255, 250, 243, 0.8);
+}
+
+.brand-copy {
+  max-width: 480px;
+  margin: 24px 0 40px;
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+.feature-list {
+  display: grid;
+  gap: 20px;
+}
+
+.feature-list article {
+  position: relative;
+  padding: 18px 18px 18px 74px;
+  border: 1px solid rgba(255, 250, 243, 0.12);
+  border-radius: 20px;
+  background: rgba(255, 250, 243, 0.04);
+}
+
+.feature-list span {
+  position: absolute;
+  left: 20px;
+  top: 18px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.4rem;
+  color: rgba(255, 250, 243, 0.55);
+}
+
+.feature-list strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.feature-list p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.form-panel {
+  background: var(--panel);
+}
+
+.panel-header p {
+  margin-top: 10px;
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.form-panel h2 {
+  font-size: clamp(2rem, 3vw, 3rem);
+}
+
+.signup-form {
+  margin-top: 32px;
+  display: grid;
+  gap: 16px;
+}
+
+.signup-form label {
+  display: grid;
+  gap: 10px;
+}
+
+.signup-form span {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.signup-form input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel-strong);
+  padding: 15px 18px;
+  font: inherit;
+  color: var(--text);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.signup-form input:focus {
+  outline: none;
+  border-color: rgba(200, 76, 45, 0.65);
+  box-shadow: 0 0 0 5px rgba(200, 76, 45, 0.12);
+  transform: translateY(-1px);
+}
+
+.consent-box {
+  margin-top: 4px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.5);
+  display: grid;
+  gap: 12px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.checkbox-row input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+  transform: none;
+  box-shadow: none;
+}
+
+.form-message {
+  min-height: 24px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.form-message.is-error {
+  color: var(--error);
+}
+
+.form-message.is-success {
+  color: var(--success);
+}
+
+.submit-button {
+  margin-top: 6px;
+  border: 0;
+  border-radius: 18px;
+  padding: 17px 20px;
+  font: 700 1rem "Space Grotesk", sans-serif;
+  letter-spacing: 0.04em;
+  color: #fffaf3;
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+  box-shadow: 0 18px 30px rgba(143, 47, 26, 0.18);
+}
+
+.submit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 34px rgba(143, 47, 26, 0.24);
+}
+
+.submit-button:active {
+  transform: translateY(0);
+}
+
+.brand-panel,
+.form-panel,
+.feature-list article,
+.submit-button {
+  animation: fadeUp 700ms ease both;
+}
+
+.form-panel {
+  animation-delay: 100ms;
+}
+
+.feature-list article:nth-child(2) {
+  animation-delay: 180ms;
+}
+
+.feature-list article:nth-child(3) {
+  animation-delay: 260ms;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 980px) {
+  .page-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-panel,
+  .form-panel {
+    padding: 40px 28px;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    width: min(100% - 20px, 100%);
+    margin: 10px auto;
+    border-radius: 24px;
+  }
+
+  .brand-panel h1 {
+    font-size: 2.5rem;
+  }
+
+  .feature-list article {
+    padding-left: 64px;
+  }
+}

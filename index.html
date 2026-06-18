@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="brand-panel">
+      <p class="eyebrow">NEW MEMBER ACCESS</p>
+      <h1>당신의 시작을<br>선명하게 만드세요.</h1>
+      <p class="brand-copy">
+        빠르게 가입하고, 맞춤형 경험을 바로 시작할 수 있도록 구성한 회원가입 페이지입니다.
+      </p>
+      <div class="feature-list">
+        <article>
+          <span>01</span>
+          <strong>간결한 흐름</strong>
+          <p>필수 정보만 먼저 받는 구조로 진입 장벽을 낮췄습니다.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <strong>즉시 검증</strong>
+          <p>입력값을 바로 확인해 오류를 줄이도록 했습니다.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <strong>모바일 대응</strong>
+          <p>작은 화면에서도 폼 가독성과 버튼 접근성을 유지합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="form-panel">
+      <div class="panel-header">
+        <p class="panel-kicker">Create account</p>
+        <h2>회원가입</h2>
+        <p>기본 정보를 입력하고 계정을 생성하세요.</p>
+      </div>
+
+      <form class="signup-form" id="signupForm" novalidate>
+        <label>
+          <span>이름</span>
+          <input type="text" name="name" placeholder="홍길동" required>
+        </label>
+
+        <label>
+          <span>이메일</span>
+          <input type="email" name="email" placeholder="name@example.com" required>
+        </label>
+
+        <label>
+          <span>비밀번호</span>
+          <input type="password" name="password" placeholder="8자 이상 입력" minlength="8" required>
+        </label>
+
+        <label>
+          <span>비밀번호 확인</span>
+          <input type="password" name="confirmPassword" placeholder="비밀번호를 다시 입력" minlength="8" required>
+        </label>
+
+        <label>
+          <span>휴대폰 번호</span>
+          <input type="tel" name="phone" placeholder="010-1234-5678" required>
+        </label>
+
+        <div class="consent-box">
+          <label class="checkbox-row">
+            <input type="checkbox" name="terms" required>
+            <span>이용약관 및 개인정보 처리방침에 동의합니다.</span>
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="marketing">
+            <span>이벤트 및 혜택 알림을 수신합니다.</span>
+          </label>
+        </div>
+
+        <p class="form-message" id="formMessage" aria-live="polite"></p>
+
+        <button type="submit" class="submit-button">가입 완료</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
