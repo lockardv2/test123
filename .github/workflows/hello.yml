@@ -1,0 +1,14 @@
+name: Hello test
+
+on:
+  workflow_dispatch:   # 수동 실행 버튼을 만든다
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest # 임시 우분투 서버 떠서
+    steps:
+      - name: 인사하기
+        run: echo "Hello, GitHub Actions!" # 명령실행 1
+
+      - name: 날짜 출력
+        run: date # 명령 실행2
