@@ -1,0 +1,17 @@
+name: Codex 자동 실행 (push)
+
+on:
+  push:              # 코드가 push 되면 자동 실행
+    branches:
+      - main
+
+jobs:
+  codex:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt: "이 폴더에 어떤 파일들이 있는지 목록으로 알려주고, 각각 무슨 파일인지 한 줄로 설명해줘."
