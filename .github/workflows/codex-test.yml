@@ -1,0 +1,23 @@
+name: Codex test
+
+on:
+  workflow_dispatch:   # Actions 탭에서 수동 실행 버튼 생성
+
+jobs:
+  codex:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Run Codex
+        id: run_codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt: "이 저장소에 어떤 파일들이 있는지 한 줄로 요약해줘."
+          output-file: codex-output.md
+
+      - name: Show result
+        run: cat codex-output.md
