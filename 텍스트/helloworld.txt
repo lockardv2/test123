@@ -1,0 +1,52 @@
+tetrisdsdadsadas
+111111111111111111
+22222222222222222222
+3
+
+
+
+asaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+ssssssssssssssssssssssssssssssssss
+// Simple Calculator
+function add(a, b) {
+    return a + b;
+}
+function subtract(a, b) {
+    return a - b;
+}
+function multiply(a, b) {
+    return a * b;
+}
+function divide(a, b) {
+    if (b === 0) {
+        return 'Cannot divide by zero';
+    }
+    return a / b;
+}
+
+// Simple Timer
+function startTimer(durationInSeconds, onTick, onEnd) {
+    let remaining = durationInSeconds;
+    const intervalId = setInterval(() => {
+        if (onTick) onTick(remaining);
+        remaining--;
+        if (remaining < 0) {
+            clearInterval(intervalId);
+            if (onEnd) onEnd();
+        }
+    }, 1000);
+    return intervalId;
+}
+
+
+ssssssssssssssssssssssssssssssssssd
+1
+111111112222222222222222222222
+2333333333333333333
+5555555555555555555555555555555555555555555555555555555
+
+
+
+53분에 닫기 저장 예정정
